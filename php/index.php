@@ -1,7 +1,7 @@
 <?php
 
 
-$message = "Hello KEVIN, tu as mis des moullures au plafond ?";
+$message = "Welcome to my Project SGBD";
 
 // Encadrer le message
 $border = str_repeat("-", strlen($message) + 2);
