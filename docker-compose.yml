@@ -1,0 +1,58 @@
+services:
+  web:
+    build:
+      context: ./web_php
+      dockerfile: php.Dockerfile
+    container_name: PhpApache
+    image: php:8.0-apache
+    networks:
+      - my-network
+    depends_on:
+      - db
+    volumes:
+      - ./web_php/:/var/www/html/
+    working_dir: /var/www/html
+    ports:
+      - "8080:80"
+  db:
+    image: mysql:8.0
+    container_name: mysql8    
+    networks:
+      - my-network
+    command:
+      - '--default-authentication-plugin=caching_sha2_password'
+      - '--character-set-server=utf8'
+      - '--collation-server=utf8_unicode_ci'
+      - '--local-infile=ON'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: test
+      MYSQL_PASSWORD: pass
+    ports:
+      - 3306:3306
+    volumes:
+      # Files 
+      - ./data_files:/data_files
+      # Config 
+      - ./conf.d:/etc/mysql/conf.d
+      # DB Localhost
+      - ./mysql_data:/var/lib/mysql
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    networks:
+      - my-network
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_ARBITRARY: 1
+      PMA_PORT: 3306
+    ports:
+      - '8081:80'
+volumes:
+  mysql_data: {}
+
+networks:
+  my-network:
