@@ -1,0 +1,8 @@
+# Exclure le répertoire dbdata
+dbdata/
+
+# Exclure les fichiers Dockerfile et docker-compose
+Dockerfile
+docker-compose.yml
+
+
