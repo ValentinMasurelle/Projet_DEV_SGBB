@@ -73,3 +73,5 @@ WHERE a.CLI_ID = 4;
 
 SELECT VOL_PLACES_LIBRES FROM T_VOL WHERE VOL_ID = 4;
 CALL ReservationVol(5,2,1);
+
+-- Insertion des données dans la table 'Sportif'
