@@ -30,7 +30,6 @@ BEGIN
                 ' - Auteur : ', user_name  -- Nom de l'utilisateur ayant effectué l'insertion
             )
         );
-
 END $$
 
 -- Retour au délimiteur standard
