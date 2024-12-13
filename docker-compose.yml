@@ -38,6 +38,8 @@ services:
       - ./conf.d:/etc/mysql/conf.d
       # DB Localhost
       - ./mysql_data:/var/lib/mysql
+      # Init.sql to grant privileges for user test 
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
