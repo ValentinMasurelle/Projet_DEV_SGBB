@@ -1,0 +1,34 @@
+
+DROP TABLE IF EXISTS T_CLIENT_TRI;
+
+DROP TABLE IF EXISTS T_LOG_TRI;
+
+DROP TABLE IF EXISTS T_ERROR_LOG;
+
+drop table if exists T_EMPRUNT_TRI;
+
+CREATE TABLE T_CLIENT_TRI (
+	id_client INT AUTO_INCREMENT,
+	Nom_client VARCHAR(50),
+	type_client CHAR(1),
+	PRIMARY KEY (id_client)
+);
+CREATE TABLE T_EMPRUNT_TRI (
+	id_emprunt INT AUTO_INCREMENT,
+	id_client INT,
+	type_emprunt CHAR(1),
+	PRIMARY KEY (id_emprunt)
+);
+
+CREATE TABLE T_LOG_TRI (
+	id_log INT AUTO_INCREMENT,
+	timestamp_log DATETIME,
+	msg_log VARCHAR(200),
+	PRIMARY KEY (id_log)
+);
+
+CREATE TABLE T_ERREUR_TRI (
+	id_error INT AUTO_INCREMENT,
+	lib_error VARCHAR(200),
+	PRIMARY KEY (id_error)
+);
