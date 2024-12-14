@@ -1,3 +1,18 @@
+/*=============================================================
+|                   ✈️ QUERY Vol_Client                       |
+|-------------------------------------------------------------|
+|  📌 AUTHOR      : Masurelle Valentin                        |
+|  📅 DATE        : 2024-12-14                                |
+|  📝 DESCRIPTION : Create database, manage flights, 		  |	
+	client reservations.                                      |
+|                                                             |
+|                                                             |
+|                                                             |
+|  🗄️ DATABASE    : Comprendre SQL                            |
+=============================================================*/
+
+
+
 -- Drop the 'ComprendreSQL' database if it already exists
 DROP DATABASE IF EXISTS `ComprendreSQL`;
 
@@ -68,6 +83,9 @@ JOIN
     T_VOL c ON b.`VOL_ID` = c.`VOL_ID`
 WHERE 
     a.CLI_ID = 4;
+
+-- Joining the table T_CLIENT_VOL with alias b to T_CLIENT with the CLI_ID from the two tables
+-- Joining the table T_VOL with alias c to T_CLIENT with the VOL_ID from the two tables  
 
 -- Retrieve the number of available seats for flight ID 4
 SELECT VOL_PLACES_LIBRES FROM T_VOL WHERE VOL_ID = 4;
