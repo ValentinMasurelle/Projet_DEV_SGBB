@@ -1,43 +1,43 @@
--- Utilisation de la base de données ComprendreSQL
+-- This commande is use to use the database ComprendreSQL
 USE ComprendreSQL;
 
--- Récupération du nom de l'utilisateur actuel
+-- Retrieve current user name who's use the databse
 SELECT CURRENT_USER();
 
--- Suppression de la trigger existante si elle existe déjà
+-- Delete existing trigger if it already exists 
 DROP TRIGGER IF EXISTS trg_before_insert_client;
 
--- Définition du délimiteur pour permettre l'utilisation de ';' dans la trigger
+-- Set delimiter to allow use of ';' in trigger
 DELIMITER $$
 
--- Création de la trigger trg_before_insert_client
--- Cette trigger se déclenche avant une insertion sur la table T_CLIENT_TRI
+-- Creation of the trg_before_insert_client trigger
+-- This trigger is triggered before an insertion into the T_CLIENT_TRI table.
 CREATE TRIGGER trg_before_insert_client BEFORE INSERT
 	ON T_CLIENT_TRI
-    FOR EACH ROW 
+    FOR EACH ROW  -- Is used with triggers and specifies that the trigger should execute once for each affected row when a spécified event occurs 
     BEGIN 
-        -- Déclaration d'une variable pour stocker le nom de l'utilisateur
+        -- Declaration of a variable to store the user's name with max 20 characters 
         DECLARE user_name VARCHAR(20);
 
-        -- Récupération du nom de l'utilisateur actuel et stockage dans la variable
+        -- Retrieve current user name and store in variable user_name 
         SELECT current_user() INTO user_name;
 
-        -- Enregistrement de la modification dans T_LOG_TRI
-        -- Insère l'heure actuelle et un message détaillant l'insertion
+        -- Save change in T_LOG_TRI
+        -- Inserts the current time and a message detailing the insertion in the table T_LOG_TRI 
         INSERT INTO
             T_LOG_TRI (timestamp_log, msg_log)
         VALUES
             (
-                now(),  -- Insère l'heure actuelle de l'insertion
-                CONCAT (  -- Concatène un message détaillé pour le log
+                now(),  -- Inserts current time of insertion
+                CONCAT (  -- Concatenates a detailed log message
                     'Insertion table client Id et valeur ',
-                    NEW.id_client,  -- ID du client inséré
-                    ' - ', NEW.Nom_client,  -- Nom du client
-                    ' - ', NEW.type_client,  -- Type du client
-                    ' - Auteur : ', user_name  -- Nom de l'utilisateur qui a effectué l'insertion
+                    NEW.id_client,  -- ID of the client inserted
+                    ' - ', NEW.Nom_client,  -- Name of the client
+                    ' - ', NEW.type_client,  -- Type og the client
+                    ' - Auteur : ', user_name  -- Username that execute the insertion 
                 )
             );
     END $$
 
--- Retour au délimiteur standard
+-- Return to standard delimiter
 DELIMITER ;
