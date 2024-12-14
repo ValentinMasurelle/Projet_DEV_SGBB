@@ -1,4 +1,4 @@
--- This commande is use to use the database ComprendreSQL
+-- This command is use to use the database ComprendreSQL
 USE ComprendreSQL;
 
 -- Retrieve current user name who's use the databse

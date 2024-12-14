@@ -1,78 +1,79 @@
--- Active: 1733166735969@@127.0.0.1@3306
---
+-- Drop the 'ComprendreSQL' database if it already exists
 DROP DATABASE IF EXISTS `ComprendreSQL`;
+
+-- Create a new database named 'ComprendreSQL'
 CREATE DATABASE `ComprendreSQL`;
+
+-- Use the 'ComprendreSQL' database for the following queries
 USE ComprendreSQL;
+
+-- Create the 'T_VOL' table to store flight information
 CREATE TABLE T_VOL (
-	VOL_ID INTEGER,
-	VOL_REFERENCE CHAR(6),
-	VOL_PLACES_LIBRES INTEGER);
+    VOL_ID INTEGER,              -- Unique identifier for the flight
+    VOL_REFERENCE CHAR(6),       -- Flight reference (6 characters)
+    VOL_PLACES_LIBRES INTEGER    -- Number of available seats on the flight
+);
 
+-- Create the 'T_CLIENT_VOL' table to manage client reservations
 CREATE TABLE T_CLIENT_VOL (
-	CLI_ID INTEGER,
-	VOL_ID INTEGER,
-	VOL_PLACE_PRISE INTEGER);
+    CLI_ID INTEGER,              -- Client identifier
+    VOL_ID INTEGER,              -- Flight identifier for the reservation
+    VOL_PLACE_PRISE INTEGER      -- Number of seats reserved by the client
+);
 
+-- Create the 'T_CLIENT' table to store client information
 CREATE TABLE T_CLIENT (
-	CLI_ID INTEGER,
-	CLI_NOM VARCHAR(50));
+    CLI_ID INTEGER,              -- Unique identifier for the client
+    CLI_NOM VARCHAR(50)          -- Client's name (up to 50 characters)
+);
 
-INSERT INTO
-	T_CLIENT
-VALUES
-	(1, 'Mickey');
-	INSERT INTO
-	T_CLIENT
-VALUES
-	(2, 'Donald');
-	INSERT INTO
-	T_CLIENT
-VALUES
-	(4, 'Dingo');
-INSERT INTO
-	T_CLIENT
-VALUES
-	(5, 'Pluto');
+-- Insert data into the 'T_CLIENT' table
+INSERT INTO T_CLIENT VALUES (1, 'Mickey');
+INSERT INTO T_CLIENT VALUES (2, 'Donald');
+INSERT INTO T_CLIENT VALUES (4, 'Goofy');
+INSERT INTO T_CLIENT VALUES (5, 'Pluto');
 
-INSERT INTO
-	T_VOL
-VALUES
-	(1, 'AF 714', 7);
+-- Insert data into the 'T_VOL' table
+INSERT INTO T_VOL VALUES (1, 'AF 714', 7);   -- Flight AF 714 with 7 available seats
+INSERT INTO T_VOL VALUES (2, 'AF 812', 6);   -- Flight AF 812 with 6 available seats
+INSERT INTO T_VOL VALUES (4, 'AF 325', 258); -- Flight AF 325 with 258 available seats
 
-INSERT INTO
-	T_VOL
-VALUES
-	(2, 'AF 812', 6);
+-- Insert data into the 'T_CLIENT_VOL' table (client reservations)
+INSERT INTO T_CLIENT_VOL VALUES (7, 1, 2);   -- Client 7 reserved 2 seats on flight 1
+INSERT INTO T_CLIENT_VOL VALUES (82, 4, 1);  -- Client 82 reserved 1 seat on flight 4
 
-INSERT INTO
-	T_VOL
-VALUES
-	(4, 'AF 325', 258);
+-- Select all records from the 'T_CLIENT_VOL' table
+SELECT * FROM T_CLIENT_VOL;
 
-INSERT INTO
-	T_CLIENT_VOL
-VALUES
-	(7, 1, 2);
-
-INSERT INTO
-	T_CLIENT_VOL
-VALUES
-	(82, 4, 1);
-SELECT * FROM T_CLIENT_VOL; 
+-- Select all records from the 'T_VOL' table
 SELECT * FROM T_VOL;
+
+-- Select all records from the 'T_CLIENT' table
 SELECT * FROM T_CLIENT;
 
-INSERT INTO
-	T_CLIENT
-VALUES
-	(5, 'Pluto');
-SELECT a.`CLI_ID`,a.`CLI_NOM`,c.`VOL_REFERENCE`,b.`VOL_PLACE_PRISE` FROM T_CLIENT a 
-JOIN T_CLIENT_VOL b ON a.`CLI_ID` = b.`CLI_ID` 
-JOIN T_VOL c ON b.`VOL_ID` = c.`VOL_ID`
-WHERE a.CLI_ID = 4;
+-- Insert another record for Pluto (client ID 5) into the 'T_CLIENT' table
+INSERT INTO T_CLIENT VALUES (5, 'Pluto');
 
+-- Retrieve client details and their flight reservations for client ID 4
+SELECT 
+    a.`CLI_ID`,                 -- Client ID
+    a.`CLI_NOM`,                -- Client name
+    c.`VOL_REFERENCE`,          -- Flight reference
+    b.`VOL_PLACE_PRISE`         -- Number of seats reserved
+FROM 
+    T_CLIENT a
+JOIN 
+    T_CLIENT_VOL b ON a.`CLI_ID` = b.`CLI_ID`
+JOIN 
+    T_VOL c ON b.`VOL_ID` = c.`VOL_ID`
+WHERE 
+    a.CLI_ID = 4;
+
+-- Retrieve the number of available seats for flight ID 4
 SELECT VOL_PLACES_LIBRES FROM T_VOL WHERE VOL_ID = 4;
-CALL ReservationVol(5,2,1);
 
--- Insertion des données dans la table 'Sportif'
-DROP USER 'test'@'localhost'
+-- Call a stored procedure 'ReservationVol' to make a reservation (parameters: client ID 5, flight ID 2, 1 seat)
+CALL ReservationVol(5, 2, 1);
+
+-- Drop the 'test' user if it exists on the localhost server
+DROP USER 'test'@'localhost';
