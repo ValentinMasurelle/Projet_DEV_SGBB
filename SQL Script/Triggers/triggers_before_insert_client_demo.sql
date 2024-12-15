@@ -2,7 +2,7 @@
 |                   📝 QUERY: trg_before_insert_client.sql    |
 |-------------------------------------------------------------|
 |  👨‍💻 AUTHOR      : Masurelle Valentin                     |
-|  📅 DATE        : 2024-12-14                                |
+|  📅 DATE        : 2024-12-15                                |
 |  📝 DESCRIPTION : Trigger to log before inserting a client |
 |  🗄️ DATABASE    : ComprendreSQL                            |
 =============================================================*/

@@ -1,8 +1,8 @@
 /*=============================================================
-|                   📝 QUERY: sync_users_tables.sql          |
+|                   📝 QUERY: triggers_insert_update_error    |
 |-------------------------------------------------------------|
-|  👨‍💻 AUTHOR      : Masurelle Valentin                     |
-|  📅 DATE        : 2024-12-14                                |
+|  👨‍💻 AUTHOR      : Masurelle Valentin                       |
+|  📅 DATE        : 2024-12-15                                |
 |  📝 DESCRIPTION : Synchronizes `users` data between db_1 and db_2 with error logging |
 |  🗄️ DATABASE    : ComprendreSQL                            |
 =============================================================*/
