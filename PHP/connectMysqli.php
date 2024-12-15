@@ -3,7 +3,7 @@
 |                   🖼️ SCRIPT: connectMysqli.php              |
 |-------------------------------------------------------------|
 |  📌 AUTHOR      : Masurelle Valentin                        |
-|  📅 DATE        : 2024-12-14                                |
+|  📅 DATE        : 2024-12-15                                |
 |  📝 DESCRIPTION : Inserts a new record into the T_CLIENT_TRI|
 |                  table and handles success or error cases. |
 |                                                             |

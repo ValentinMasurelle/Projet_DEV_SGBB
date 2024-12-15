@@ -3,7 +3,7 @@
 |                   🖼️ SCRIPT: connect.php                 |
 |-------------------------------------------------------------|
 |  📌 AUTHOR      : Masurelle Valentin                        |
-|  📅 DATE        : 2024-12-14                                |
+|  📅 DATE        : 2024-12-15                                |
 |  📝 DESCRIPTION : Establishes a connection to the MySQL     |
 |                  database using MySQLi and checks the       |
 |                  connection status.                         |
