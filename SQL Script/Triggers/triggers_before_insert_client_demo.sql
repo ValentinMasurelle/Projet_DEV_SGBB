@@ -1,7 +1,16 @@
--- This command is use to use the database ComprendreSQL
+/*=============================================================
+|                   📝 QUERY: trg_before_insert_client.sql    |
+|-------------------------------------------------------------|
+|  👨‍💻 AUTHOR      : Masurelle Valentin                     |
+|  📅 DATE        : 2024-12-14                                |
+|  📝 DESCRIPTION : Trigger to log before inserting a client |
+|  🗄️ DATABASE    : ComprendreSQL                            |
+=============================================================*/
+
+-- This command is used to select the database ComprendreSQL
 USE ComprendreSQL;
 
--- Retrieve current user name who's use the databse
+-- Retrieve the current user's name who is using the database
 SELECT CURRENT_USER();
 
 -- Delete existing trigger if it already exists 
@@ -13,31 +22,31 @@ DELIMITER $$
 -- Creation of the trg_before_insert_client trigger
 -- This trigger is triggered before an insertion into the T_CLIENT_TRI table.
 CREATE TRIGGER trg_before_insert_client BEFORE INSERT
-	ON T_CLIENT_TRI
-    FOR EACH ROW  -- Is used with triggers and specifies that the trigger should execute once for each affected row when a spécified event occurs 
+    ON T_CLIENT_TRI
+    FOR EACH ROW  -- Execute the trigger once for each affected row during an event
     BEGIN 
         -- Declaration of a variable to store the user's name with max 20 characters 
         DECLARE user_name VARCHAR(20);
 
-        -- Retrieve current user name and store in variable user_name 
+        -- Retrieve current user name and store it in the variable user_name 
         SELECT current_user() INTO user_name;
 
-        -- Save change in T_LOG_TRI
-        -- Inserts the current time and a message detailing the insertion in the table T_LOG_TRI 
+        -- Save the change in T_LOG_TRI
+        -- Inserts the current time and a message detailing the insertion into T_LOG_TRI 
         INSERT INTO
             T_LOG_TRI (timestamp_log, msg_log)
         VALUES
             (
-                now(),  -- Inserts current time of insertion
+                now(),  -- Inserts the current time of the insertion
                 CONCAT (  -- Concatenates a detailed log message
                     'Insertion table client Id et valeur ',
                     NEW.id_client,  -- ID of the client inserted
                     ' - ', NEW.Nom_client,  -- Name of the client
-                    ' - ', NEW.type_client,  -- Type og the client
-                    ' - Auteur : ', user_name  -- Username that execute the insertion 
+                    ' - ', NEW.type_client,  -- Type of the client
+                    ' - Auteur : ', user_name  -- Username that executed the insertion 
                 )
             );
     END $$
 
--- Return to standard delimiter
+-- Return to the standard delimiter
 DELIMITER ;
