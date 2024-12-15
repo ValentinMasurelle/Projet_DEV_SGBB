@@ -10,6 +10,11 @@
 -- ==============================
 -- SECTION 1: Users Table Creation in `db_1` and `db_2`
 -- ==============================
+-- Vérifier si la base de données existe déjà
+CREATE DATABASE IF NOT EXISTS `db_1`;
+
+-- Sélectionner la base de données
+USE `db_1`;
 
 -- Drop the `users` table in `db_1` if it exists
 DROP TABLE IF EXISTS `db_1`.`users`;
@@ -21,6 +26,11 @@ CREATE TABLE IF NOT EXISTS `db_1`.`users` (
     `age` int(11) NOT NULL,                   -- User's age
     PRIMARY KEY (`id`)                        -- Primary key on `id` field
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE DATABASE IF NOT EXISTS `db_2`;
+
+-- Sélectionner la base de données
+USE `db_2`;
 
 -- Drop the `users` table in `db_2` if it exists
 DROP TABLE IF EXISTS `db_2`.`users`;

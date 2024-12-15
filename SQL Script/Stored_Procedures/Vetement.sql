@@ -25,7 +25,7 @@ DROP PROCEDURE IF EXISTS `Vetement`;
 
 -- Create a stored procedure named 'Vetement' that takes 2 IN parameters and 1 OUT parameter
 -- The procedure will return a suggested item of clothing based on temperature and weather conditions.
-DELIMITER $$  -- Change the delimiter to $$ to allow the definition of the procedure
+DELIMITER $$
 
 CREATE PROCEDURE Vetement (
     IN p_tp INT,              -- IN parameter 'p_tp' (temperature in Celsius)
@@ -33,32 +33,22 @@ CREATE PROCEDURE Vetement (
     OUT p_vet VARCHAR(50)     -- OUT parameter 'p_vet' (suggested item of clothing based on the conditions)
 )    
 BEGIN
-    -- Use a CASE statement to determine the appropriate clothing based on temperature and weather conditions
-    CASE 
-        -- If temperature is below 5°C and the weather is 'Beau' or 'Nuageux' (Clear or Cloudy),
-        -- suggest 'Manteau' (coat) as the appropriate clothing.
-        WHEN p_tp < 5 AND (p_temps = 'Beau' OR p_temps = 'Nuageux') THEN
-            SELECT 'Manteau' INTO p_vet;
-        
-        -- If temperature is below 20°C and the weather is 'Pluvieux' (Rainy),
-        -- suggest 'Impermeable' (raincoat) as the appropriate clothing.
-        WHEN p_tp < 20 AND p_temps = 'Pluvieux' THEN
-            SELECT 'Impermeable' INTO p_vet;
-        
-        -- If temperature is 20°C or higher and the weather is 'Pluvieux' (Rainy),
-        -- suggest 'Parapluie' (umbrella) as the appropriate clothing.
-        WHEN p_tp >= 20 AND p_temps = 'Pluvieux' THEN
-            SELECT 'Parapluie' INTO p_vet;
-        
-        -- If temperature is between 5°C and 20°C and the weather is 'Nuageux' (Cloudy),
-        -- suggest 'Veste' (jacket) as the appropriate clothing.
-        WHEN p_tp >= 5 AND p_tp < 20 AND p_temps = 'Nuageux' THEN
-            SELECT 'Veste' INTO p_vet;
-        
-        -- For all other conditions, suggest 'Casquette' (cap) as the default item of clothing.
-        ELSE
-            SELECT 'Casquette' INTO p_vet;
-    END CASE;
+    -- Initialize the OUT parameter with a default value
+    SET p_vet = 'Casquette';  -- Default value (for all other conditions)
+
+    -- Use IF statements to determine the appropriate clothing based on temperature and weather conditions
+    IF p_tp < 5 AND (p_temps = 'Beau' OR p_temps = 'Nuageux') THEN
+        SET p_vet = 'Manteau';
+    ELSEIF p_tp < 20 AND p_temps = 'Pluvieux' THEN
+        SET p_vet = 'Impermeable';
+    ELSEIF p_tp >= 20 AND p_temps = 'Pluvieux' THEN
+        SET p_vet = 'Parapluie';
+    ELSEIF p_tp >= 5 AND p_tp < 20 AND p_temps = 'Nuageux' THEN
+        SET p_vet = 'Veste';
+    END IF;
+    
+    -- No need for a final ELSE, because 'Casquette' is already the default value
+
 END;  -- End of procedure definition
 
 DELIMITER ;  -- Reset the delimiter back to semicolon (default)
@@ -68,7 +58,6 @@ DELIMITER ;  -- Reset the delimiter back to semicolon (default)
 -- ------------------------------------------------------------
 
 -- Call the procedure 'Vetement' with two input parameters: a temperature of 22°C and the weather condition 'Beau'.
--- The OUT parameter '@vet' will be populated with the appropriate clothing suggestion based on the logic in the procedure.
 CALL `Vetement`(22, 'Beau', @vet);
 
 -- ------------------------------------------------------------

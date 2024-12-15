@@ -14,11 +14,12 @@
 DROP TRIGGER IF EXISTS trg_after_insert_client;
 
 -- Set the delimiter to allow the use of ';' inside the trigger
-DELIMITER $$ 
+DELIMITER $$
 
 -- Create the trigger trg_after_insert_client
 -- This trigger fires after a row is inserted into the T_CLIENT_TRI table
-CREATE TRIGGER trg_after_insert_client AFTER INSERT ON T_CLIENT_TRI
+CREATE TRIGGER trg_after_insert_client 
+AFTER INSERT ON T_CLIENT_TRI
 FOR EACH ROW 
 BEGIN 
     -- Declare a variable to store the current user's name
