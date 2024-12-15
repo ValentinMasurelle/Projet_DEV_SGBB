@@ -1,33 +1,102 @@
 <?php
-// Declaring the global connection variable
+/*=============================================================
+|                   🖼️ SCRIPT: formulaire.php                |
+|-------------------------------------------------------------|
+|  📌 AUTHOR      : Masurelle Valentin                        |
+|  📅 DATE        : 2024-12-15                                |
+|  📝 DESCRIPTION : Handles user registration by collecting  |
+|                  user input, inserting it into the 'inscription'|
+|                  table, and encrypting the password.       |
+|                                                             |
+|  🗄️ DATABASE    : demo                                      |
+=============================================================*/
+
+/* ------------------------------------------------------------
+|  🔄 GLOBAL DATABASE CONNECTION
+|  ------------------------------------------------------------
+|  Declare the global database connection variable to be used 
+|  within the script. This will be initialized once the 
+|  'connect.php' file is included.
+*/
 global $conn;
 
-// Checking if the form is submitted via POST method
+/* ------------------------------------------------------------
+|  📝 HANDLE FORM SUBMISSION
+|  ------------------------------------------------------------
+|  Check if the form is submitted using the POST method. If 
+|  the 'submit' button is clicked, proceed with data validation 
+|  and insertion into the database.
+*/
 if (isset($_POST['submit'])) {
-    // Ensure that both 'nom' and 'password' fields are not empty
+    /* ------------------------------------------------------------
+    |  🔒 VALIDATE FORM FIELDS
+    |  ------------------------------------------------------------
+    |  Ensure that both the 'nom' (first name) and 'password' 
+    |  fields are filled. If either of them is empty, the form 
+    |  will not proceed.
+    */
     if (!empty($_POST['nom']) && !empty($_POST['password'])) {
       
-        // Including the database connection script (connect.php)
+        /* ------------------------------------------------------------
+        |  🔄 INCLUDE DATABASE CONNECTION
+        |  ------------------------------------------------------------
+        |  Include the 'connect.php' file, which contains the database 
+        |  connection details. This file will provide the $conn 
+        |  variable for interacting with the database.
+        */
         require "connect.php";
 
-        // Preparing the SQL statement for inserting data into the 'inscription' table
+        /* ------------------------------------------------------------
+        |  🌐 PREPARE SQL STATEMENT
+        |  ------------------------------------------------------------
+        |  Prepare an SQL statement to insert the user’s data into 
+        |  the 'inscription' table. The table has fields for 'nom' 
+        |  (first name) and 'motdepasse' (password).
+        */
         $stmt = $conn->prepare("INSERT INTO `inscription` (`nom`, `motdepasse`) VALUES (?, ?)");
-        
-        // Binding the parameters to the prepared statement (both 'nom' and 'password' are strings)
-        $stmt->bind_param("ss", $nom, $password);  
 
-        // Assigning form values to variables
+        /* ------------------------------------------------------------
+        |  🔗 BIND PARAMETERS
+        |  ------------------------------------------------------------
+        |  Bind the form input values to the prepared statement. 
+        |  Both the 'nom' and 'password' fields are passed as 
+        |  string values ('ss').
+        */
+        $stmt->bind_param("ss", $nom, $password);
+
+        /* ------------------------------------------------------------
+        |  📝 ASSIGN FORM VALUES TO VARIABLES
+        |  ------------------------------------------------------------
+        |  Assign the form data ('nom' and 'password') to PHP 
+        |  variables before inserting them into the database.
+        */
         $nom = $_POST['nom'];
-        // Encrypting the password using MD5 before storing it (note: MD5 is not secure for passwords in production environments)
+        
+        /* ------------------------------------------------------------
+        |  🔐 ENCRYPT PASSWORD
+        |  ------------------------------------------------------------
+        |  Encrypt the user's password using MD5 before storing it 
+        |  in the database. Note that MD5 is considered insecure 
+        |  for password encryption in production environments.
+        */
         $password = md5($_POST['password']);
 
-        // Executing the prepared statement to insert the values into the database
+        /* ------------------------------------------------------------
+        |  🚀 EXECUTE THE QUERY
+        |  ------------------------------------------------------------
+        |  Execute the prepared statement to insert the user data 
+        |  into the 'inscription' table. If the insertion is 
+        |  successful, display a success message.
+        */
         $stmt->execute();
-
-        // Output a success message after the record is created
         echo "New records created successfully";
 
-        // Closing the prepared statement and the database connection
+        /* ------------------------------------------------------------
+        |  🔒 CLOSE RESOURCES
+        |  ------------------------------------------------------------
+        |  Close the prepared statement and database connection 
+        |  to free up resources after the operation.
+        */
         $stmt->close();
         $conn->close();
     }
