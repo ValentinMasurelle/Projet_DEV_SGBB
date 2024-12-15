@@ -1,77 +1,86 @@
--- Suppression de la trigger existante si elle existe
+/*=============================================================
+|                   📝 QUERY: trg_before_update_client.sql    |
+|-------------------------------------------------------------|
+|  👨‍💻 AUTHOR      : Masurelle Valentin                     |
+|  📅 DATE        : 2024-12-14                                |
+|  📝 DESCRIPTION : Trigger to log before updating a client  |
+|  🗄️ DATABASE    : ComprendreSQL                            |
+=============================================================*/
+
+-- Drop the existing trigger if it exists
 DROP TRIGGER IF EXISTS before_update_client;
 
--- Changement du délimiteur pour permettre des caractères spéciaux dans la trigger
+-- Change the delimiter to allow special characters in the trigger
 DELIMITER $$
 
--- Création de la trigger before_update_client
--- Cette trigger se déclenche avant une mise à jour sur la table T_CLIENT_TRI
+-- Create the before_update_client trigger
+-- This trigger fires before an update on the T_CLIENT_TRI table
 CREATE TRIGGER before_update_client BEFORE UPDATE ON T_CLIENT_TRI
 FOR EACH ROW 
 BEGIN
-    -- Enregistrement dans la table T_LOG_TRI des informations de modification
-    -- Enregistre l'horodatage et un message spécifiant le client modifié
+    -- Log the modification information into the T_LOG_TRI table
+    -- Records the timestamp and a message specifying the modified client
     INSERT INTO
         T_LOG_TRI (timestamp_log, msg_log)
     VALUES
         (
-            now(),  -- Insère l'heure actuelle
-            CONCAT (  -- Concatène le texte pour le message log
-                'modification table client sur client ',
-                NEW.id_client  -- Récupère l'ID du client modifié
+            now(),  -- Inserts the current time
+            CONCAT (  -- Concatenates the text for the log message
+                'Client modification in client table for client ',
+                NEW.id_client  -- Retrieves the ID of the modified client
             )
         );
 
-    -- Vérification du type de client
-    -- Si le type de client est différent de 'P' (Personne) et 'E' (Entreprise)
-    -- une erreur est levée, annulant la modification
+    -- Check the client type
+    -- If the client type is different from 'P' (Person) and 'E' (Company)
+    -- an error is raised, canceling the modification
     IF NEW.type_client IS NOT NULL
-        AND NEW.type_client != 'P' -- Type de client Personne
-        AND NEW.type_client != 'E' -- Type de client Entreprise
+        AND NEW.type_client != 'P' -- Client type Person
+        AND NEW.type_client != 'E' -- Client type Company
     THEN 
-        -- Levée d'une erreur personnalisée
+        -- Raise a custom error
         SIGNAL sqlstate '45000'	
-        SET MESSAGE_TEXT = 'Modification annulée ! Erreur de type client pour le client ';
+        SET MESSAGE_TEXT = 'Modification canceled! Client type error for client ';
     END IF;
 END $$
 
--- Retour au délimiteur standard
+-- Return to the standard delimiter
 DELIMITER ;
 
--- Deuxième création de la trigger before_update_client 
--- Cette version modifie le type de client à 'P' si une erreur de type client est détectée
--- Elle insère également un enregistrement dans la table T_ERREUR_TRI pour signaler l'erreur
+-- Second creation of the before_update_client trigger
+-- This version modifies the client type to 'P' if an invalid client type is detected
+-- It also inserts a record into the T_ERREUR_TRI table to log the error
 DELIMITER $$
 
 CREATE TRIGGER before_update_client BEFORE UPDATE ON T_CLIENT_TRI
 FOR EACH ROW 
 BEGIN
-    -- Enregistrement de la modification dans T_LOG_TRI
+    -- Log the modification into T_LOG_TRI
     INSERT INTO
         T_LOG_TRI (timestamp_log, msg_log)
     VALUES
         (
-            now(),  -- Date et heure de la modification
-            CONCAT (  -- Message de log pour la modification
-                'modification table client sur client ',
-                NEW.id_client  -- ID du client concerné
+            now(),  -- Date and time of the modification
+            CONCAT (  -- Log message for the modification
+                'Client modification in client table for client ',
+                NEW.id_client  -- ID of the client involved
             )
         );
 
-    -- Vérification du type de client
-    -- Si le type est invalide (autre que 'P' ou 'E'), corrige la valeur
+    -- Check the client type
+    -- If the type is invalid (not 'P' or 'E'), it corrects the value
     IF NEW.type_client IS NOT NULL
-        AND NEW.type_client != 'P' -- Type de client Personne
-        AND NEW.type_client != 'E' -- Type de client Entreprise
+        AND NEW.type_client != 'P' -- Client type Person
+        AND NEW.type_client != 'E' -- Client type Company
     THEN 
-        -- Correction du type de client à 'P' (par défaut)
+        -- Correct the client type to 'P' (default)
         SET NEW.type_client = 'P';
 
-        -- Enregistrement de l'erreur dans T_ERREUR_TRI pour une analyse ultérieure
+        -- Log the error in T_ERREUR_TRI for later analysis
         INSERT INTO T_ERREUR_TRI (lib_error) VALUES
-        (CONCAT ('Erreur de type client pour le client ', NEW.id_client));
+        (CONCAT ('Client type error for client ', NEW.id_client));
     END IF;
 END $$
 
--- Retour au délimiteur standard
+-- Return to the standard delimiter
 DELIMITER ;
