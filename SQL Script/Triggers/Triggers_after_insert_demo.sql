@@ -1,36 +1,48 @@
--- Suppression de la trigger existante si elle existe déjà
+/*=============================================================
+|                   📝 QUERY: trg_after_insert_client.sql     |
+|-------------------------------------------------------------|
+|  👨‍💻 AUTHOR      : Masurelle Valentin                     |
+|  📅 DATE        : 2024-12-14                                |
+|  📝 DESCRIPTION : Trigger to log after inserting a client  |
+|                                                         |
+|                                                         |
+|                                                         |
+|  🗄️ DATABASE    : ComprendreSQL                            |
+=============================================================*/
+
+-- Drop the existing trigger if it already exists
 DROP TRIGGER IF EXISTS trg_after_insert_client;
 
--- Définition du délimiteur pour permettre l'utilisation de ';' dans la trigger
+-- Set the delimiter to allow the use of ';' inside the trigger
 DELIMITER $$ 
 
--- Création de la trigger trg_after_insert_client
--- Cette trigger se déclenche après l'insertion d'une ligne dans la table T_CLIENT_TRI
+-- Create the trigger trg_after_insert_client
+-- This trigger fires after a row is inserted into the T_CLIENT_TRI table
 CREATE TRIGGER trg_after_insert_client AFTER INSERT ON T_CLIENT_TRI
 FOR EACH ROW 
 BEGIN 
-    -- Déclaration d'une variable pour stocker le nom de l'utilisateur
+    -- Declare a variable to store the current user's name
     DECLARE user_name VARCHAR(20);
 
-    -- Récupération du nom de l'utilisateur actuel et stockage dans la variable
+    -- Fetch the current user and store it in the variable
     SELECT current_user() INTO user_name;
 
-    -- Enregistrement de la modification dans T_LOG_TRI
-    -- Insère l'heure actuelle et un message détaillant l'insertion
+    -- Log the modification in the T_LOG_TRI table
+    -- Insert the current timestamp and a detailed message about the insertion
     INSERT INTO
         T_LOG_TRI (timestamp_log, msg_log)
     VALUES
         (
-            now(),  -- Insère l'heure actuelle de l'insertion
-            CONCAT (  -- Concatène un message détaillé pour le log
-                'Insertion table client Id et valeur',
-                NEW.id_client,  -- ID du client inséré
-                ' - ', NEW.Nom_client,  -- Nom du client
-                ' - ', NEW.type_client,  -- Type du client
-                ' - Auteur : ', user_name  -- Nom de l'utilisateur ayant effectué l'insertion
+            now(),  -- Insert the current timestamp
+            CONCAT(  -- Concatenate a detailed message for the log
+                'Insertion into client table. ID: ',
+                NEW.id_client,       -- ID of the inserted client
+                ' - Name: ', NEW.Nom_client,  -- Name of the client
+                ' - Type: ', NEW.type_client,  -- Type of the client
+                ' - Author: ', user_name       -- User who performed the insertion
             )
         );
 END $$
 
--- Retour au délimiteur standard
+-- Reset the delimiter to the default
 DELIMITER ;
