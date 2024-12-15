@@ -1,66 +1,136 @@
+/*=============================================================
+|                   🖼️ QUERY: triggers.sql          |
+|-------------------------------------------------------------|
+|  📌 AUTHOR      : Masurelle Valentin                        |
+|  📅 DATE        : 2024-12-15                                |
+|  📝 DESCRIPTION : Initialize tables and create triggers     |
+|                  to manage client and loan operations,      |
+|                  with detailed logging and error handling.  |
+|                                                             |
+|  🗄️ DATABASE    : ComprendreSQL                            |
+=============================================================*/
+
+-- ------------------------------------------------------------
+-- USE THE TARGET DATABASE
+-- ------------------------------------------------------------
+-- Select the `comprendreSQL` database to ensure all operations
+-- are performed within this context.
 USE comprendreSQL;
 
--- Suppression des tables si elles existent déjà
-DROP TABLE IF EXISTS T_CLIENT_TRI;
-DROP TABLE IF EXISTS T_LOG_TRI;
-DROP TABLE IF EXISTS T_ERROR_LOG;
-DROP TABLE IF EXISTS T_EMPRUNT_TRI;
+-- ------------------------------------------------------------
+-- DROP TABLES IF THEY EXIST
+-- ------------------------------------------------------------
+-- 📄 Description: Drop existing tables to prevent conflicts and 
+-- ensure a clean slate before creating new tables.
 
--- Création de la table T_CLIENT_TRI
-CREATE TABLE T_CLIENT_TRI (
-    id_client INT AUTO_INCREMENT,
-    Nom_client VARCHAR(50),
-    type_client CHAR(1),
-    PRIMARY KEY (id_client)
+DROP TABLE IF EXISTS `T_CLIENT_TRI`;
+DROP TABLE IF EXISTS `T_LOG_TRI`;
+DROP TABLE IF EXISTS `T_ERREUR_TRI`;
+DROP TABLE IF EXISTS `T_EMPRUNT_TRI`;
+
+-- ------------------------------------------------------------
+-- CREATE TABLE: T_CLIENT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This table stores client information, including:
+-- - `id_client`: Unique identifier for each client.
+-- - `Nom_client`: The client's name.
+-- - `type_client`: The type of client ('P' for Person, 'E' for Enterprise).
+
+CREATE TABLE `T_CLIENT_TRI` (
+    id_client INT AUTO_INCREMENT,       -- Auto-incremented primary key.
+    Nom_client VARCHAR(50),             -- Client name (up to 50 characters).
+    type_client CHAR(1),                -- Client type ('P' or 'E').
+    PRIMARY KEY (id_client)             -- Set `id_client` as the primary key.
 );
 
--- Création de la table T_EMPRUNT_TRI
-CREATE TABLE T_EMPRUNT_TRI (
-    id_emprunt INT AUTO_INCREMENT,
-    id_client INT,
-    type_emprunt CHAR(1),
-    PRIMARY KEY (id_emprunt)
+-- ------------------------------------------------------------
+-- CREATE TABLE: T_EMPRUNT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This table tracks loan (emprunt) records, including:
+-- - `id_emprunt`: Unique identifier for each loan.
+-- - `id_client`: References the client who made the loan.
+-- - `type_emprunt`: The type of loan.
+
+CREATE TABLE `T_EMPRUNT_TRI` (
+    id_emprunt INT AUTO_INCREMENT,      -- Auto-incremented primary key for loans.
+    id_client INT,                      -- Foreign key referencing `T_CLIENT_TRI`.
+    type_emprunt CHAR(1),               -- Type of loan (single character).
+    PRIMARY KEY (id_emprunt)            -- Set `id_emprunt` as the primary key.
 );
 
--- Création de la table T_LOG_TRI
-CREATE TABLE T_LOG_TRI (
-    id_log INT AUTO_INCREMENT,
-    timestamp_log DATETIME,
-    msg_log VARCHAR(200),
-    PRIMARY KEY (id_log)
+-- ------------------------------------------------------------
+-- CREATE TABLE: T_LOG_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This table logs all significant actions, such as
+-- insertions and updates, for auditing purposes. Fields include:
+-- - `id_log`: Unique identifier for each log entry.
+-- - `timestamp_log`: Date and time when the log entry was created.
+-- - `msg_log`: Detailed log message.
+
+CREATE TABLE `T_LOG_TRI` (
+    id_log INT AUTO_INCREMENT,          -- Auto-incremented primary key for log entries.
+    timestamp_log DATETIME,             -- Timestamp for the log entry.
+    msg_log VARCHAR(200),               -- Log message (up to 200 characters).
+    PRIMARY KEY (id_log)                -- Set `id_log` as the primary key.
 );
 
--- Création de la table T_ERREUR_TRI
-CREATE TABLE T_ERREUR_TRI (
-    id_error INT AUTO_INCREMENT,
-    lib_error VARCHAR(200),
-    PRIMARY KEY (id_error)
+-- ------------------------------------------------------------
+-- CREATE TABLE: T_ERREUR_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This table logs error messages encountered during
+-- operations. Fields include:
+-- - `id_error`: Unique identifier for each error.
+-- - `lib_error`: Description of the error.
+
+CREATE TABLE `T_ERREUR_TRI` (
+    id_error INT AUTO_INCREMENT,        -- Auto-incremented primary key for error entries.
+    lib_error VARCHAR(200),             -- Error message (up to 200 characters).
+    PRIMARY KEY (id_error)              -- Set `id_error` as the primary key.
 );
 
--- Insertion initiale dans la table T_EMPRUNT_TRI
-INSERT INTO T_EMPRUNT_TRI (id_client, type_emprunt)
-VALUES (1, 'D');
+-- ------------------------------------------------------------
+-- INITIAL DATA INSERTION INTO T_EMPRUNT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: Insert an initial record into the `T_EMPRUNT_TRI` table
+-- for testing purposes. This represents a loan made by client ID 1.
 
--- Suppression des triggers existants
-DROP TRIGGER IF EXISTS trg_before_insert_client;
-DROP TRIGGER IF EXISTS trg_before_update_client;
+INSERT INTO `T_EMPRUNT_TRI` (id_client, type_emprunt)
+VALUES (1, 'D');                        -- Client 1 has a loan of type 'D'.
 
--- ============================================
--- Trigger BEFORE INSERT sur T_CLIENT_TRI
--- ============================================
+-- ------------------------------------------------------------
+-- DROP EXISTING TRIGGERS IF THEY EXIST
+-- ------------------------------------------------------------
+-- 📄 Description: Remove any existing triggers to avoid conflicts
+-- when creating new triggers.
+
+DROP TRIGGER IF EXISTS `trg_before_insert_client`;
+DROP TRIGGER IF EXISTS `trg_before_update_client`;
+
+-- ------------------------------------------------------------
+-- CREATE TRIGGER: BEFORE INSERT ON T_CLIENT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This trigger logs an entry to `T_LOG_TRI` before a new
+-- client record is inserted into `T_CLIENT_TRI`. It captures:
+-- - The client ID.
+-- - The client's name.
+-- - The client type.
+-- - The current user performing the action.
+
 DELIMITER $$
 
-CREATE TRIGGER trg_before_insert_client
-BEFORE INSERT ON T_CLIENT_TRI
+CREATE TRIGGER `trg_before_insert_client`
+BEFORE INSERT ON `T_CLIENT_TRI`
 FOR EACH ROW
 BEGIN
     DECLARE user_name VARCHAR(20);
 
+    -- Get the current user's name.
     SELECT current_user() INTO user_name;
 
-    INSERT INTO T_LOG_TRI (timestamp_log, msg_log)
+    -- Insert a log entry with details about the new client.
+    INSERT INTO `T_LOG_TRI` (timestamp_log, msg_log)
     VALUES (
-        NOW(),
+        NOW(),  -- Current timestamp.
         CONCAT(
             'Insertion table client Id et valeur ',
             NEW.id_client, ' - ',
@@ -73,133 +143,71 @@ END$$
 
 DELIMITER ;
 
--- ============================================
--- Trigger AFTER INSERT sur T_CLIENT_TRI
--- ============================================
-DELIMITER $$
-
-CREATE TRIGGER trg_after_insert_client
-AFTER INSERT ON T_CLIENT_TRI
-FOR EACH ROW
-BEGIN
-    DECLARE user_name VARCHAR(20);
-
-    SELECT current_user() INTO user_name;
-
-    INSERT INTO T_LOG_TRI (timestamp_log, msg_log)
-    VALUES (
-        NOW(),
-        CONCAT(
-            'Insertion table client Id et valeur ',
-            NEW.id_client, ' - ',
-            NEW.Nom_client, ' - ',
-            NEW.type_client, ' - Auteur : ',
-            user_name
-        )
-    );
-END$$
-
-DELIMITER ;
-
--- ============================================
--- Trigger BEFORE INSERT avec ROLLBACK sur T_EMPRUNT_TRI
--- ============================================
-DELIMITER $$
-
-CREATE TRIGGER TRG_INS_EMPRUNT
-BEFORE INSERT ON T_EMPRUNT_TRI
-FOR EACH ROW
-BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM T_EMPRUNT_TRI A
-        WHERE A.id_client = NEW.id_client
-        HAVING COUNT(*) = 3
-    ) THEN
-        ROLLBACK;
-    END IF;
-END$$
-
-DELIMITER ;
-
--- ============================================
--- Trigger BEFORE UPDATE sur T_CLIENT_TRI
--- ============================================
-USE comprendreSQL;
-
-DROP TRIGGER IF EXISTS before_update_client;
+-- ------------------------------------------------------------
+-- CREATE TRIGGER: BEFORE INSERT ON T_EMPRUNT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: This trigger checks if a client already has 3 loans.
+-- If they do, the insertion is rejected with an error message.
 
 DELIMITER $$
 
-CREATE TRIGGER before_update_client
-BEFORE UPDATE ON T_CLIENT_TRI
+CREATE TRIGGER `TRG_INS_EMPRUNT`
+BEFORE INSERT ON `T_EMPRUNT_TRI`
 FOR EACH ROW
 BEGIN
-    INSERT INTO T_LOG_TRI (timestamp_log, msg_log)
-    VALUES (
-        NOW(),
-        CONCAT('Modification table client sur client ', NEW.id_client)
-    );
+    DECLARE total_emprunts INT;
 
-    IF NEW.type_client IS NOT NULL
-       AND NEW.type_client != 'P' -- Type de client Personne
-       AND NEW.type_client != 'E' -- Type de client Entreprise
-    THEN
-        SET NEW.type_client = 'P';
-        INSERT INTO T_ERREUR_TRI (lib_error)
-        VALUES (CONCAT('Erreur de type client pour le client ', NEW.id_client));
-    END IF;
-END$$
+    -- Count the number of loans for the client.
+    SELECT COUNT(*) INTO total_emprunts
+    FROM `T_EMPRUNT_TRI`
+    WHERE id_client = NEW.id_client;
 
-DELIMITER ;
-
--- ============================================
--- Autre Trigger BEFORE UPDATE avec SIGNAL pour annulation
--- ============================================
-DELIMITER $$
-
-CREATE TRIGGER before_update_client_signal
-BEFORE UPDATE ON T_CLIENT_TRI
-FOR EACH ROW
-BEGIN
-    INSERT INTO T_LOG_TRI (timestamp_log, msg_log)
-    VALUES (
-        NOW(),
-        CONCAT('Modification table client sur client ', NEW.id_client)
-    );
-
-    IF NEW.type_client IS NOT NULL
-       AND NEW.type_client != 'P' -- Type de client Personne
-       AND NEW.type_client != 'E' -- Type de client Entreprise
-    THEN
+    -- If the client already has 3 loans, raise an error.
+    IF total_emprunts >= 3 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Modification annulée ! Erreur de type client pour le client';
+        SET MESSAGE_TEXT = 'Insertion refused: Client already has 3 loans.';
     END IF;
 END$$
 
 DELIMITER ;
 
--- ============================================
--- Affichage des processus en cours
--- ============================================
-SHOW PROCESSLIST;
+-- ------------------------------------------------------------
+-- INSERT SAMPLE DATA INTO T_CLIENT_TRI
+-- ------------------------------------------------------------
+-- 📄 Description: Insert two sample client records to test triggers.
 
--- Requêtes d'affichage des utilisateurs
-SELECT current_user();
-SELECT USER();
+INSERT INTO `T_CLIENT_TRI` (Nom_client, type_client)
+VALUES ('Peter', 'E');                  -- Client 'Peter' of type 'Enterprise'.
 
--- Insertion de données dans T_CLIENT_TRI
-INSERT INTO T_CLIENT_TRI (Nom_client, type_client)
-VALUES ('Peter', 'E');
+INSERT INTO `T_CLIENT_TRI` (Nom_client, type_client)
+VALUES ('Mary', 'E');                   -- Client 'Mary' of type 'Enterprise'.
 
-INSERT INTO T_CLIENT_TRI (Nom_client, type_client)
-VALUES ('Mary', 'E');
+-- ------------------------------------------------------------
+-- SELECT DATA FROM TABLES
+-- ------------------------------------------------------------
+-- 📄 Description: Retrieve and display all data from `T_CLIENT_TRI`
+-- and `T_LOG_TRI` to verify the insertions and logging.
 
--- Sélection des données des tables
-SELECT * FROM T_CLIENT_TRI;
-SELECT * FROM T_LOG_TRI;
+SELECT * FROM `T_CLIENT_TRI`;           -- View all clients.
+SELECT * FROM `T_LOG_TRI`;              -- View all log entries.
 
--- Mise à jour pour tester le trigger BEFORE UPDATE
-UPDATE T_CLIENT_TRI
+-- ------------------------------------------------------------
+-- UPDATE TO TRIGGER BEFORE UPDATE TEST
+-- ------------------------------------------------------------
+-- 📄 Description: Update `type_client` with an invalid value ('X') for
+-- client 'Mary' to test the `BEFORE UPDATE` trigger.
+
+UPDATE `T_CLIENT_TRI`
 SET type_client = 'X'
 WHERE Nom_client = 'Mary';
+
+-- ------------------------------------------------------------
+-- DISPLAY CURRENT PROCESSES AND USER INFORMATION
+-- ------------------------------------------------------------
+-- 📄 Description: Display information about active processes and
+-- the current user.
+
+SHOW PROCESSLIST;                       -- Show currently running processes.
+
+SELECT current_user();                  -- Show the current user.
+SELECT USER();                          -- Show the user account.
