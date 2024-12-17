@@ -18,12 +18,12 @@ CREATE TABLE `orderdetails` (
   KEY `productCode` (`productCode`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE VIEW salePerOrder AS
+CREATE VIEW 'ComprendreSQL'.'salePerOrder' AS
     SELECT 
         orderNumber, 
         SUM(quantityOrdered * priceEach) total
     FROM
-        orderDetails
+        orderdetails
     GROUP by orderNumber
     ORDER BY total DESC;
     
