@@ -28,33 +28,36 @@ CREATE TABLE T_BANK (
     BANK_Name VARCHAR(50)
 );
 
+-- This table stores account information, linking each account to a bank and a client.
+-- It includes an auto-incrementing primary key for the account, foreign keys for the bank and client,
+-- a bank account number limited to 19 characters, and the account balance with two decimal places.
+
 CREATE TABLE T_ACCOUNT (
-    -- Primary key: Unique identifier for each account
     ACCOUNT_ID INTEGER AUTO_INCREMENT PRIMARY KEY,
-    
-    -- Foreign key referencing the BANK table (assuming BANK_ID exists in the BANK table)
-    BANK_ID INTEGER, -- Add this column to support the BANK foreign key
+    BANK_ID INTEGER,
     CONSTRAINT FK_BANK FOREIGN KEY (BANK_ID) REFERENCES T_BANK (BANK_ID),
-    
-    -- Foreign key referencing the CLIENT table (assuming CLIENT_ID exists in the CLIENT table)
-    CLIENT_ID INTEGER, -- Add this column to support the CLIENT foreign key
+    CLIENT_ID INTEGER,
     CONSTRAINT FK_CLIENT FOREIGN KEY (CLIENT_ID) REFERENCES T_CLIENT (CLIENT_ID),
-    
-    -- Bank number for the account (19 characters maximum as specified)
-    ACCOUNT_BankNumber VARCHAR(19), -- Max 19 characters because all accounts have 19 characters
-    
-    -- Account balance or amount (using DECIMAL for more precision)
-    ACCOUNT_Amount DECIMAL(15, 2) -- Allows for large amounts with two decimal places for cents
+    ACCOUNT_BankNumber VARCHAR(19),
+    ACCOUNT_Amount DECIMAL(15, 2)
 );
- 
+
+-- This table stores loan information, linking each loan to a bank and a client.
+-- It includes an auto-incrementing primary key for the loan, foreign keys for the bank and client,
+-- a loan account number limited to 19 characters, and the loan amount with two decimal places.
 
 CREATE TABLE T_LOAN (
     LOAN_ID INTEGER AUTO_INCREMENT PRIMARY KEY,
-    CONSTRAINT FK_BANK PRIMARY KEY(BANK_ID)
-    CONSTRAINT FK_CLIENT PRIMARY KEY(CLIENT_ID),
+    
+    BANK_ID INTEGER,
+    CONSTRAINT FK_T_LOAN_BANK FOREIGN KEY (BANK_ID) REFERENCES T_BANK (BANK_ID),
+    
+    CLIENT_ID INTEGER,
+    CONSTRAINT FK_T_LOAN_CLIENT FOREIGN KEY (CLIENT_ID) REFERENCES T_CLIENT (CLIENT_ID),
+    
     LOAN_Account VARCHAR(19),
-    LOAN_Amount INT
-) 
+    LOAN_Amount DECIMAL(15, 2)
+);
 
 
 
