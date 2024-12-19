@@ -1,58 +1,56 @@
---LOAD DATA
---    [LOW_PRIORITY | CONCURRENT] [LOCAL]
---    INFILE 'file_name'
---    [REPLACE | IGNORE]
---    INTO TABLE tbl_name
---    [PARTITION (partition_name [, partition_name] ...)]
---    [CHARACTER SET charset_name]
---    [{FIELDS | COLUMNS}
---        [TERMINATED BY 'string']
---        [[OPTIONALLY] ENCLOSED BY 'char']
---        [ESCAPED BY 'char']
---    ]
---    [LINES
---        [STARTING BY 'string']
---        [TERMINATED BY 'string']
---    ]
---    [IGNORE number {LINES | ROWS}]
---    [(col_name_or_user_var
---        [, col_name_or_user_var] ...)]
---    [SET col_name={expr | DEFAULT}
---        [, col_name={expr | DEFAULT}] ...]
--- Lors du chargement il peut-être nécessaire de dissocier les foreign key
--- SET FOREIGN_KEY_CHECKS=0; dissocier
--- SET FOREIGN_KEY_CHECKS=1; associer
--- Autre attention, pour importer des données, avec MYSQL docker, il est nécessaire de configurer la mise en oeuvre du container Mysql comme suit :
--- Dans le fichier docker-compose.yml on y ajouter les paramètres :
---
----- Files
---      - ./data_files:/data_files  le montange de ce volume est nécessaire pour déposer les fichiers sources
----- Config
---		Lorsque on installe un container Mysql, les options de configuration sont localisées dans /etc/mysql.my.cnf.d
---		Mais on l'a dèjà mentionné, une fois un container fermé, rien n'est persisté !
---		On va donc mapper un répertoire sur la machone hôte et le containeur, comme si dessus.
---		Dans le répertoire (hôte) locale, on va y mettre un fichier de configuration, avec les options à ajouter.conf
---		Dans notre cas, il est nécessaire de stipuler à mysql que le répertoire de chargement pour l'exécution de LOAD DATA FILE.conf
---		Cette spécification est indiquée dans l'option secure-file-priv
---		[mysqld]
---		secure-file-priv = "/data_files"
---		Pour contrôler l'option : SHOW VARIABLES LIKE "secure_file_priv";
---      - /home/xavier/Docker/web_php/mysql8/conf.d:/etc/mysql/conf.d
---
---      -- Dirs
---
--- Remarque : avant de charger une table avec un AUTO_INCRFEMENT, il faut s'assurer de partir de zéro
--- Comment faire ...
--- 1. ALTER TABLE nomDeLaTable AUTO_INCREMENT=0
--- 2. A la création de la table mettre l'option AUTO_INCREMENT=0
---
--- Commençons par dissocier les foreign keys
+/*=============================================================
+|                   🏦 DATA LOAD Bank.sql                    |
+|-------------------------------------------------------------|
+|  📌 AUTHOR      : Masurelle Valentin                        |
+|  📅 DATE        : 2024-12-17                                |
+|  📝 DESCRIPTION : This script loads data into the BANK 
+|                  database from CSV files into the tables:
+|                  - T_CLIENT (Clients)
+|                  - T_BANK (Banks)
+|                  - T_ACCOUNT (Accounts)
+|                  - T_LOAN (Loans)                           |
+|                                                             |
+|  📅 DATE_MODIFIED : 2024-12-19                              |
+|                                                             |
+|  🗄️ DATABASE    : BANK                                     |
+=============================================================*/
+
+-- ------------------------------------------------------------
+-- 📂 SECTION 1: CHECKING AND CONFIGURING VARIABLES
+-- ------------------------------------------------------------
+
+/*
+   📌 DESCRIPTION:
+   Check the MySQL server variables related to file loading and ensure the `local_infile` option is enabled.
+*/
+
+-- Check if 'local_infile' is enabled
 SHOW VARIABLES LIKE 'local_infile';
 
-SHOW VARIABLES LIKE "secure_file_priv";
-SET
-  FOREIGN_KEY_CHECKS = 0;
--- 1. Chargement de la table client
+-- Check the path allowed for secure file loading
+SHOW VARIABLES LIKE 'secure_file_priv';
+
+-- Temporarily disable foreign key checks to avoid constraint errors during data loading
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ------------------------------------------------------------
+-- 📂 SECTION 2: LOADING DATA INTO TABLES
+-- ------------------------------------------------------------
+
+/* 
+   📌 DESCRIPTION:
+   This section loads data from CSV files into the respective tables in the BANK database.
+*/
+
+-- -----------------------------------
+-- 🗂️ 2.1 Load Data into T_CLIENT Table
+-- -----------------------------------
+/*
+   📌 DESCRIPTION:
+   Load client data from `Client.csv` into the `T_CLIENT` table.
+   The fields in the CSV are terminated by commas and enclosed by double quotes.
+*/
+
 LOAD DATA INFILE "/var/lib/mysql-files/Client.csv" 
 INTO TABLE `Bank`.`T_CLIENT`
 FIELDS TERMINATED BY ',' 
@@ -60,40 +58,85 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 (CLIENT_Lastname, CLIENT_Firstname, CLIENT_City, CLIENT_ZipCode);
 
-SELECT
-  *
-FROM
-  `Bank`.`T_CLIENT`;
--- 2. Chargement de la table agence
-  LOAD DATA INFILE "/var/lib/mysql-files/Agence.csv" INTO TABLE `Bank`.`T_BANK` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (BANK_Name, BANK_Ammount);
-SELECT
-  *
-FROM
-  `Bank`.`T_BANK`;
--- 3. Chargement de la table compte
-  LOAD DATA INFILE "/var/lib/mysql-files/compte.csv" INTO TABLE `Bank`.`T_ACCOUNT` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
-    CLIENT_ID,
+-- Verify the data loaded into T_CLIENT
+SELECT * FROM `Bank`.`T_CLIENT`;
+
+-- -----------------------------------
+-- 🗂️ 2.2 Load Data into T_BANK Table
+-- -----------------------------------
+/*
+   📌 DESCRIPTION:
+   Load bank data from `Agence.csv` into the `T_BANK` table.
+   The fields in the CSV are terminated by semicolons.
+*/
+
+LOAD DATA INFILE "/var/lib/mysql-files/Agence.csv" 
+INTO TABLE `Bank`.`T_BANK`
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '' 
+LINES TERMINATED BY '\n'
+(BANK_Name, BANK_Ammount);
+
+-- Verify the data loaded into T_BANK
+SELECT * FROM `Bank`.`T_BANK`;
+
+-- -----------------------------------
+-- 🗂️ 2.3 Load Data into T_ACCOUNT Table
+-- -----------------------------------
+/*
+   📌 DESCRIPTION:
+   Load account data from `compte.csv` into the `T_ACCOUNT` table.
+   The fields in the CSV are terminated by semicolons.
+*/
+
+LOAD DATA INFILE "/var/lib/mysql-files/compte.csv" 
+INTO TABLE `Bank`.`T_ACCOUNT`
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '' 
+LINES TERMINATED BY '\n'
+(
     BANK_ID,
+    CLIENT_ID,
     ACCOUNT_BankNumber,
     ACCOUNT_Amount
-  );
-SELECT
-  *
-FROM
-  `Bank`.`T_ACCOUNT`;
--- 4.Chargement de la table numemprunt
-  LOAD DATA INFILE "/var/lib/mysql-files/emprunt.csv" INTO TABLE `Bank`.`T_LOAN` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
+);
+
+-- Verify the data loaded into T_ACCOUNT
+SELECT * FROM `Bank`.`T_ACCOUNT`;
+
+-- -----------------------------------
+-- 🗂️ 2.4 Load Data into T_LOAN Table
+-- -----------------------------------
+/*
+   📌 DESCRIPTION:
+   Load loan data from `emprunt.csv` into the `T_LOAN` table.
+   The fields in the CSV are terminated by semicolons.
+*/
+
+LOAD DATA INFILE "/var/lib/mysql-files/emprunt.csv" 
+INTO TABLE `Bank`.`T_LOAN`
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '' 
+LINES TERMINATED BY '\n'
+(
     BANK_ID,
     CLIENT_ID,
     LOAN_Account,
     LOAN_Amount
-  );
-SELECT
-  *
-FROM
-  `Bank`.`T_LOAN`;
--- Une fois les chargements effectués, on peut réactiver les foreign key. Et si les données sont correctes, cela ne doit pas pas poser de problèmes
-SET
-  FOREIGN_KEY_CHECKS = 1;
+);
+
+-- Verify the data loaded into T_LOAN
+SELECT * FROM `Bank`.`T_LOAN`;
+
+-- ------------------------------------------------------------
+-- 📂 SECTION 3: REACTIVATING FOREIGN KEY CHECKS
+-- ------------------------------------------------------------
+
+/*
+   📌 DESCRIPTION:
+   After data loading, re-enable foreign key checks. If the data is correct, this should not cause any issues.
+*/
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 
