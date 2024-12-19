@@ -48,28 +48,30 @@
 --
 -- Commençons par dissocier les foreign keys
 SHOW VARIABLES LIKE 'local_infile';
+
 SHOW VARIABLES LIKE "secure_file_priv";
 SET
   FOREIGN_KEY_CHECKS = 0;
 -- 1. Chargement de la table client
-  LOAD DATA INFILE "/data_files/Client.csv" INTO TABLE `Banque`.`client` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' (
-    nom,
-    prenom,
-    ville,
-    codePostal
-  );
+LOAD DATA INFILE "/var/lib/mysql-files/Client.csv" 
+INTO TABLE `Bank`.`T_CLIENT`
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\n'
+(CLIENT_Lastname, CLIENT_Firstname, CLIENT_City, CLIENT_ZipCode);
+
 SELECT
   *
 FROM
-  `Banque`.`client`;
+  `Bank`.`T_CLIENT`;
 -- 2. Chargement de la table agence
-  LOAD DATA INFILE "/data_files/agence.csv" INTO TABLE `Banque`.`agence` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (nom, actif);
+  LOAD DATA INFILE "/var/lib/mysql-files/agence.csv" INTO TABLE `Bank`.`agence` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (nom, actif);
 SELECT
   *
 FROM
-  `Banque`.`agence`;
+  `Bank`.`agence`;
 -- 3. Chargement de la table compte
-  LOAD DATA INFILE "/data_files/compte.csv" INTO TABLE `Banque`.`compte` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
+  LOAD DATA INFILE "/var/lib/mysql-files/compte.csv" INTO TABLE `Bank`.`compte` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
     numclient,
     numagence,
     numcompte,
@@ -78,9 +80,9 @@ FROM
 SELECT
   *
 FROM
-  `Banque`.`compte`;
+  `Bank`.`compte`;
 -- 4.Chargement de la table numemprunt
-  LOAD DATA INFILE "/data_files/emprunt.csv" INTO TABLE `Banque`.`emprunt` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
+  LOAD DATA INFILE "/var/lib/mysql-files/emprunt.csv" INTO TABLE `Bank`.`emprunt` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
     numagence,
     numclient,
     numemprunt,
@@ -89,7 +91,7 @@ FROM
 SELECT
   *
 FROM
-  `Banque`.`emprunt`;
+  `Bank`.`emprunt`;
 -- Une fois les chargements effectués, on peut réactiver les foreign key. Et si les données sont correctes, cela ne doit pas pas poser de problèmes
 SET
   FOREIGN_KEY_CHECKS = 1;

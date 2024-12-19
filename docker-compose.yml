@@ -1,3 +1,4 @@
+
 services:
   web:
     build:
@@ -16,6 +17,9 @@ services:
       - "8080:80"
   db:
     image: mysql:8.0
+    build:
+      context: ./conf.d 
+      dockerfile: Mysql.Dockerfile
     container_name: mysql8    
     networks:
       - my-network
@@ -33,13 +37,11 @@ services:
       - 3306:3306
     volumes:
       # Files 
-      - ./data_files:/data_files
+      - ./data_files:/var/lib/mysql-files/
       # Config 
       - ./conf.d:/etc/mysql/conf.d
       # DB Localhost
       - ./mysql_data:/var/lib/mysql
-      # Init.sql to grant privileges for user test 
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin

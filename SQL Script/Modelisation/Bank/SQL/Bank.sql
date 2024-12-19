@@ -11,18 +11,23 @@
 |                                                             |
 |  🗄️ DATABASE    : BANK                                     |
 =============================================================*/
-
+DROP DATABASE IF EXISTS BANK
 
 CREATE DATABASE `BANK`;
 USE BANK;
 
+DROP TABLE IF EXISTS T_CLIENT
+
 CREATE TABLE T_CLIENT (
-    CLIENT_ID INTEGER AUTO_INCREMENT PRIMARY KEY,              
+    CLIENT_ID INTEGER PRIMARY KEY AUTO_INCREMENT,              
     CLIENT_Lastname VARCHAR(50),       
     CLIENT_Firstname VARCHAR(50),
     CLIENT_City VARCHAR(50),
-    CLIENT_ZipCode VARCHAR(4)
+    CLIENT_ZipCode VARCHAR(20)
 );
+
+ALTER TABLE T_CLIENT AUTO_INCREMENT =0 
+
 CREATE TABLE T_BANK (
     BANK_ID INTEGER AUTO_INCREMENT PRIMARY KEY,              
     BANK_Name VARCHAR(50)
