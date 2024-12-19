@@ -85,8 +85,18 @@ WHERE
         INNER JOIN 
             T_CLIENT C2 ON A.CLIENT_ID = C2.CLIENT_ID
         WHERE 
-            C2.CLIENT_Lastname = 'COUDERC'
+            A.BANK_ID IN (
+                SELECT DISTINCT 
+                    A2.BANK_ID
+                FROM 
+                    T_ACCOUNT A2
+                INNER JOIN 
+                    T_CLIENT C3 ON A2.CLIENT_ID = C3.CLIENT_ID
+                WHERE 
+                    C3.CLIENT_Lastname = 'COUDERC'
+            )
     );
+
 
 -- -----------------------------------
 -- 🔍 QUERY 4: CLIENTS WITH ACCOUNTS IN MORE THAN ONE BANK
