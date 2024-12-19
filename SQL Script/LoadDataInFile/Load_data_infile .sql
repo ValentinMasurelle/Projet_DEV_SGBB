@@ -65,33 +65,35 @@ SELECT
 FROM
   `Bank`.`T_CLIENT`;
 -- 2. Chargement de la table agence
-  LOAD DATA INFILE "/var/lib/mysql-files/agence.csv" INTO TABLE `Bank`.`agence` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (nom, actif);
+  LOAD DATA INFILE "/var/lib/mysql-files/Agence.csv" INTO TABLE `Bank`.`T_BANK` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (BANK_Name, BANK_Ammount);
 SELECT
   *
 FROM
-  `Bank`.`agence`;
+  `Bank`.`T_BANK`;
 -- 3. Chargement de la table compte
-  LOAD DATA INFILE "/var/lib/mysql-files/compte.csv" INTO TABLE `Bank`.`compte` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
-    numclient,
-    numagence,
-    numcompte,
-    solde
+  LOAD DATA INFILE "/var/lib/mysql-files/compte.csv" INTO TABLE `Bank`.`T_ACCOUNT` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
+    CLIENT_ID,
+    BANK_ID,
+    ACCOUNT_BankNumber,
+    ACCOUNT_Amount
   );
 SELECT
   *
 FROM
-  `Bank`.`compte`;
+  `Bank`.`T_ACCOUNT`;
 -- 4.Chargement de la table numemprunt
-  LOAD DATA INFILE "/var/lib/mysql-files/emprunt.csv" INTO TABLE `Bank`.`emprunt` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
-    numagence,
-    numclient,
-    numemprunt,
-    montant
+  LOAD DATA INFILE "/var/lib/mysql-files/emprunt.csv" INTO TABLE `Bank`.`T_LOAN` FIELDS TERMINATED BY ';' ENCLOSED BY '' LINES TERMINATED BY '\n' (
+    BANK_ID,
+    CLIENT_ID,
+    LOAN_Account,
+    LOAN_Amount
   );
 SELECT
   *
 FROM
-  `Bank`.`emprunt`;
+  `Bank`.`T_LOAN`;
 -- Une fois les chargements effectués, on peut réactiver les foreign key. Et si les données sont correctes, cela ne doit pas pas poser de problèmes
 SET
   FOREIGN_KEY_CHECKS = 1;
+
+
