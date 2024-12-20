@@ -1,5 +1,5 @@
 /*=============================================================
-|                   📝 QUERY: Library_Book_List               |
+|                   📝 livres.php                            |
 |-------------------------------------------------------------|
 |  👨‍💻 AUTHOR      : Masurelle Valentin                       |
 |  📅 DATE        : 2024-12-20                                |
@@ -7,7 +7,7 @@
 |                  the library. It uses output buffering to 
 |                  manage dynamic content and includes a 
 |                  template for consistent page layout.       |
-|  🗄️ DATABASE    : BANK                                     |
+|                                                             |
 =============================================================*/
 
 <?php ob_start() ?>
