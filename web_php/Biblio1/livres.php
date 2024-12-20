@@ -1,31 +1,27 @@
-<?php ob_start() ?>
+/*=============================================================
+|                   📝 livres.php                            |
+|-------------------------------------------------------------|
+|  👨‍💻 AUTHOR      : Masurelle Valentin                       |
+|  📅 DATE        : 2024-12-20                                |
+|  📝 DESCRIPTION : This script lists the books available in 
+|                  the library. It uses output buffering to 
+|                  manage dynamic content and includes a 
+|                  template for consistent page layout.       |
+|                                                             |
+=============================================================*/
 
-<table class="table text-center">
-    <tr class="table-dark">
-        <th>Image</th>
-        <th>Titre</th>
-        <th>Nombre de pages</th>
-        <th colspan="2">Actions</th>
-    </tr>
-    <tr>
-        <td class="align-middle"><img src="public/images/algo.png" width="60px;"></td>
-        <td class="align-middle">Algorithmique selon H2PROG</td>
-        <td class="align-middle">300</td>
-        <td class="align-middle"><a href="" class="btn btn-warning">Modifier</a></td>
-        <td class="align-middle"><a href="" class="btn btn-danger">Supprimer</a></td>
-    </tr>
-    <tr>
-        <td class="align-middle"><img src="public/images/virus.png" width="60px;"></td>
-        <td class="align-middle">Le virus Asiatique</td>
-        <td class="align-middle">200</td>
-        <td class="align-middle"><a href="" class="btn btn-warning">Modifier</a></td>
-        <td class="align-middle"><a href="" class="btn btn-danger">Supprimer</a></td>
-    </tr>
-</table>
-<a href="" class="btn btn-success d-block">Ajouter</a>
+<?php ob_start() ?>
+<!-- Starts output buffering. All output between ob_start() and ob_get_clean() is captured in the buffer. -->
+
+ici le contenu de ma page listant les livres
 
 <?php
-$content = ob_get_clean();
+$content = ob_get_clean(); 
+// Ends output buffering and returns the buffered content as a string. The buffer is then cleaned (erased).
+
 $titre = "Les livres de la bibliothèque";
+// Sets the title of the page to "Les livres de la bibliothèque".
+
 require "template.php";
+// Includes the 'template.php' file, which likely contains the layout structure for the page.
 ?>
