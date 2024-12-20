@@ -43,6 +43,6 @@ $password = "pass"; // Replace with your database password.
  * 🗄️ Database Name
  * The specific database to connect to.
  */
-$database = "demo"; // Replace with the name of your database.
+$database = "Biblio"; // Replace with the name of your database.
 
 ?>

@@ -20,7 +20,7 @@
 $servername = "db";    // Name of the database server
 $username = "test";    // Username for database connection
 $password = "pass";    // Password for the database user
-$dbname = "demo";      // Database name to connect to
+$dbname = "Biblio";      // Database name to connect to
 
 /* ------------------------------------------------------------
 |  🌐 CREATE PDO CONNECTION
