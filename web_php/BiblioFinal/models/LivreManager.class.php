@@ -10,7 +10,8 @@
 |                  the list of books, and load books from the 
 |                  database into the collection.              |
 =============================================================*/
-
+require_once "Model.class.php";
+require_once "Livre.class.php";
 /**
  * LivreManager Class
  * 
@@ -78,7 +79,7 @@ class LivreManager extends Model {
                 $livre['titre'], // Book title
                 $livre['nbPages'], // Number of pages
                 $livre['image'],  // Book image
-                $livre['editeur'] // Book editor (from the database column 'editeur')
+                $livre['nomEditeur'] // Book editor (from the database column 'editeur')
             );
             // Add the created Livre object to the collection
             $this->ajoutLivre($l);  // Add the Livre object to the collection

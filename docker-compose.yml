@@ -17,9 +17,6 @@ services:
       - "8080:80"
   db:
     image: mysql:8.0
-    build:
-      context: ./conf.d 
-      dockerfile: Mysql.Dockerfile
     container_name: mysql8    
     networks:
       - my-network

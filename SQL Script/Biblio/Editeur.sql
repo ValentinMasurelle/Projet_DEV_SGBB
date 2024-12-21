@@ -28,3 +28,5 @@ INSERT INTO `editeur` (`nomEditeur`, `livre_id`) VALUES
 ('Editeur1', 3),
 ('Editeur2', 2),
 ('Editeur2', 4);
+
+DESCRIBE v_livres
