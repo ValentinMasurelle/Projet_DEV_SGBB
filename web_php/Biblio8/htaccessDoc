@@ -1,0 +1,8 @@
+RewriteEngine On # signifie que l'on va procéder à la réecriture de l'url
+# condition pour éviter de lister les fichiers (-f)
+# condition pour viter de lister les dossiers (-d)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# récriture de l'url ^(.*)$ pour prendre tout en compte
+# ensuite on indique toutes les url seront réécrites en mettant directement index.php
+RewriteRule ^(.*)$ index.php?page=$1
