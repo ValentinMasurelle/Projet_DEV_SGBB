@@ -68,6 +68,7 @@ ob_start();
         <th>Image</th>
         <th>Titre</th>
         <th>Nombre de pages</th>
+        <th>Editeur</th>
         <th colspan="2">Actions</th>
     </tr>
     
