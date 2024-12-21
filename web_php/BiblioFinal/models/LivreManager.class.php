@@ -20,7 +20,7 @@ class LivreManager extends Model{
         $req->closeCursor();
 
         foreach($mesLivres as $livre){
-            $l = new Livre($livre['id'],$livre['titre'],$livre['nbPages'],$livre['image']);
+            $l = new Livre($livre['id'],$livre['titre'],$livre['nbPages'],$livre['image'],$livre['editeur']);
             $this->ajoutLivre($l);
         }
     }
