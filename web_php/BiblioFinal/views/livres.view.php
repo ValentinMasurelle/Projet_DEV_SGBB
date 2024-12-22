@@ -28,6 +28,7 @@ ob_start();
         <th>Image</th>
         <th>Titre</th>
         <th>Nombre de pages</th>
+        <th>Editeur</th>
         <th colspan="2">Actions</th>
     </tr>
 
@@ -50,11 +51,8 @@ ob_start();
         <!-- Display the number of pages for the book -->
         <td class="align-middle"><?= $livres[$i]->getNbPages(); ?></td>
 
-        <!-- Display the number of pages for the book -->
-        <td class="align-middle"><?= $livres[$i]->getNbPages(); ?></td>
-
         <!-- Display the editeur of the book -->
-        <td class="align-middle"><?= $livres[$i]->getNbPages(); ?></td>
+        <td class="align-middle"><?= $livres[$i]->getEditeur(); ?></td>
         
         <!-- Action buttons for modifying the book -->
         <td class="align-middle">
