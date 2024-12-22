@@ -7,8 +7,12 @@
 |                  storing book information (livres) in a library 
 |                  system. It includes the creation of the table, 
 |                  inserting initial data, and modifying the table 
-|                  to include an auto-incrementing primary key.     |
+|                  to include an auto-incrementing primary key. 
+
+    📅 DATE MODIFIED: 2024-12-22 
 ====================================================================*/
+
+DROP TABLE IF EXISTS editeur
 
 CREATE TABLE `editeur` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,  -- Primary key for the editor
@@ -22,11 +26,9 @@ CREATE TABLE `editeur` (
     ON UPDATE CASCADE                   -- Update editor if related book is updated
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Insertion des éditeurs
+-- Insertion of the editors
 INSERT INTO `editeur` (`nomEditeur`, `livre_id`) VALUES
 ('Editeur1', 1),
 ('Editeur1', 3),
 ('Editeur2', 2),
 ('Editeur2', 4);
-
-DESCRIBE v_livres
